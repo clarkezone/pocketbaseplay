@@ -1,0 +1,26 @@
+{
+    "page": 1,
+    "perPage": 30,
+    "totalItems": 2,
+    "totalPages": 1,
+    "items": [
+        {
+            "@collectionId": "0hwl2m16trbd6ig",
+            "@collectionName": "urls",
+            "created": "2022-10-07 03:12:18.232",
+            "id": "do9sc9waoebgha7",
+            "long_url": "https://blog-staging.clarkezone.dev/posts/hello-world/",
+            "short_url": "l1",
+            "updated": "2022-10-10 17:21:58.684"
+        },
+        {
+            "@collectionId": "0hwl2m16trbd6ig",
+            "@collectionName": "urls",
+            "created": "2022-10-07 03:12:24.448",
+            "id": "fcj1zqpfnb2utfw",
+            "long_url": "https://blog-staging.clarkezone.dev/posts/YouTube-embed-test/",
+            "short_url": "l2",
+            "updated": "2022-10-10 17:22:25.977"
+        }
+    ]
+}
