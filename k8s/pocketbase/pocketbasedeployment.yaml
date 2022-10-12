@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: pocketbase
-        image: registry.dev.clarkezone.dev/pocketbase:latest
+        image: registry.dev.clarkezone.dev/pocketbase:arm64d
         imagePullPolicy: Always
         volumeMounts:
           - mountPath: /data
