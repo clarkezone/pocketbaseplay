@@ -7,3 +7,5 @@ resources:
 - namespace.yaml
 - pocketbasedeployment.yaml
 - persistentvolumeclaim.yaml
+- pb-service.yaml
+- pb-ingress.yaml
