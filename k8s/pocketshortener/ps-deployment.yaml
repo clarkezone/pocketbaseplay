@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ps-deployment
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: pocketshortener-ps
+  template:
+    metadata:
+    spec:
+      containers:
+      - name: pocketbase
+        image: registry.dev.clarkezone.dev/shortenerproto:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080

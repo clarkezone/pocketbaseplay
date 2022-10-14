@@ -97,6 +97,7 @@ func main() {
 
 	client := resty.New()
 
+	log.Printf("Pocketshortener.")
 	resp, err := client.R().
 		SetQueryParams(map[string]string{
 			"page_no": "1",
@@ -108,8 +109,10 @@ func main() {
 
 	if resp.StatusCode() != 200 {
 		panic(errors.New(string(resp.Body())))
+		log.Printf("Authenticated successfully")
 	}
 	if err != nil {
+		log.Printf("Authentication failed")
 		panic(err)
 	}
 
@@ -138,6 +141,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	log.Printf("Contacted PocketBase and retreived %v entries", len(dresp2.Items))
+
 	ds := NewDictstore()
 	for _, element := range dresp2.Items {
 		ds.Store(element.ShortURL, element.LongURL)
