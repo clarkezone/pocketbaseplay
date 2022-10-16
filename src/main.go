@@ -94,10 +94,17 @@ func (h handler) redirect(ctx *fasthttp.RequestCtx) {
 func main() {
 	user := os.Getenv("POCKET_SHORTEN_USERNAME")
 	pass := os.Getenv("POCKET_SHORTEN_PASSWORD")
+	url := os.Getenv("POCKET_DB_URL")
 
 	client := resty.New()
 
 	log.Printf("Pocketshortener.")
+	if url == "" {
+		panic(errors.New("Environment variable POCKET_DB_URL not set"))
+	} else {
+		log.Printf("Database url = %v", url)
+	}
+
 	resp, err := client.R().
 		SetQueryParams(map[string]string{
 			"page_no": "1",
@@ -105,7 +112,7 @@ func main() {
 		SetHeader("Accept", "application/json").
 		SetHeader("Content-Type", "application/json").
 		SetBody(`{"email":"` + user + `", "password":"` + pass + `"}`).
-		Post("http://clarkezonedevbox3-tr:9099/api/admins/auth-via-email")
+		Post(url + "api/admins/auth-via-email")
 
 	if resp.StatusCode() != 200 {
 		panic(errors.New(string(resp.Body())))
@@ -128,7 +135,7 @@ func main() {
 		}).
 		SetHeader("Accept", "application/json").
 		SetHeader("Authorization", "Admin "+dresp.Token).
-		Get("http://clarkezonedevbox3-tr:9099/api/collections/urls/records")
+		Get(url + "api/collections/urls/records")
 	if resp.StatusCode() != 200 {
 		panic(errors.New(string(resp.Body())))
 	}
