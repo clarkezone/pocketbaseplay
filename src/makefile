@@ -92,6 +92,8 @@ buildimage:
 	
 	@echo ${IMG}
 	@echo ${VERSION}
+
+	podman manifest rm localhost/pocketshortenp:latest
 	
 	podman build --arch=amd64 -t ${IMG}:${VERSION}.amd64 -f Dockerfile
 	podman build --arch=arm64 -t ${IMG}:${VERSION}.arm64 -f Dockerfile
