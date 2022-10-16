@@ -117,6 +117,8 @@ func main() {
 		log.Printf("Database pw= %v", pass)
 	}
 
+	log.Printf("Login URL %v\n", url+"api/admins/auth-via-email")
+
 	resp, err := client.R().
 		SetQueryParams(map[string]string{
 			"page_no": "1",
@@ -126,13 +128,12 @@ func main() {
 		SetBody(`{"email":"` + user + `", "password":"` + pass + `"}`).
 		Post(url + "api/admins/auth-via-email")
 
+	if err != nil {
+		log.Fatal(err)
+	}
 	if resp.StatusCode() != 200 {
 		log.Printf("Authentication failed")
 		panic(errors.New(string(resp.Body())))
-	}
-	if err != nil {
-		log.Printf("Authentication failed")
-		panic(err)
 	}
 
 	dresp := authresponse{}
