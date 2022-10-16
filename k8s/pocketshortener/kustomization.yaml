@@ -14,5 +14,5 @@ configMapGenerator:
 - name: psconfig
   literals:
   - UN=james@clarkezone.net
-  - URL=clarkezonedev/foo/bar
+  - URL=http://pocket-shortener-stage.dev.clarkezone.dev/
     

@@ -105,6 +105,18 @@ func main() {
 		log.Printf("Database url = %v", url)
 	}
 
+	if user == "" {
+		panic(errors.New("Environment variable POCKET_SHORTEN_USERNAME not set"))
+	} else {
+		log.Printf("Database un = %v", user)
+	}
+
+	if pass == "" {
+		panic(errors.New("Environment variable POCKET_SHORTEN_PASSWORD not set"))
+	} else {
+		log.Printf("Database pw= %v", pass)
+	}
+
 	resp, err := client.R().
 		SetQueryParams(map[string]string{
 			"page_no": "1",
@@ -115,8 +127,8 @@ func main() {
 		Post(url + "api/admins/auth-via-email")
 
 	if resp.StatusCode() != 200 {
+		log.Printf("Authentication failed")
 		panic(errors.New(string(resp.Body())))
-		log.Printf("Authenticated successfully")
 	}
 	if err != nil {
 		log.Printf("Authentication failed")
