@@ -6,3 +6,13 @@ commonLabels:
 resources:
 - ps-deployment.yaml
 - ps-service.yaml
+secretGenerator:
+- name: db-user-pass
+  envs:
+  - .env.password
+configMapGenerator:
+- name: psconfig
+  literals:
+  - UN=james@clarkezone.net
+  - URL=clarkezonedev/foo/bar
+    

@@ -17,3 +17,14 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        env:
+          - name: POCKET_SHORTEN_USERNAME
+            valueFrom:
+              configMapKeyRef:
+                name: psconfig
+                key: UN
+          - name: POCKET_DB_URL
+            valueFrom:
+              configMapKeyRef:
+                name: psconfig
+                key: URL
