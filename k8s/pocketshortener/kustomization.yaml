@@ -15,5 +15,5 @@ configMapGenerator:
   literals:
   - UN=james@clarkezone.net
   - URLold=https://pocket-shortner-stage.dev.clarkezone.dev/
-  - URL=pocketbase-service.pocketshortener.svc.cluster.local:8080/
+  - URL=http://pocketbase-service.pocketshortener.svc.cluster.local:8080/
     
