@@ -6,6 +6,7 @@ commonLabels:
 resources:
 - ps-deployment.yaml
 - ps-service.yaml
+- cloudflared.yaml
 secretGenerator:
 - name: db-user-pass
   envs:
