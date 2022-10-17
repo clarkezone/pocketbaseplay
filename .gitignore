@@ -1,0 +1,3 @@
+k8s/pocketshortener/.env.password
+*.swp
+src/bin/*
