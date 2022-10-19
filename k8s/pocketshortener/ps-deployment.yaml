@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ps-deployment
+  labels:
+    app: pocketshortener-ps
 spec:
   strategy:
     type: Recreate
@@ -10,6 +12,8 @@ spec:
       app: pocketshortener-ps
   template:
     metadata:
+      labels:
+        app: pocketshortener-ps
     spec:
       containers:
       - name: pocketbase
