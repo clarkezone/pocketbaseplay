@@ -20,7 +20,7 @@ configMapGenerator:
   literals:
   - UN=james@clarkezone.net
   - URLold=https://pocket-shortner-stage.dev.clarkezone.dev/
-  - URL=http://pocketbase-service:8080/
+  - URL=http://pb-service:8080/
 - name: cloudflare-blog-configs
   files:
   - config/config.yaml
