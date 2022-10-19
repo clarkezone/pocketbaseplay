@@ -80,12 +80,16 @@ func NewHandler(schema string, host string, storage Service) *router.Router {
 
 func (h handler) redirect(ctx *fasthttp.RequestCtx) {
 	code := ctx.UserValue("shortLink").(string)
+	log.Printf("Request for %v", code)
 
 	uri, err := h.storage.Lookup(code)
 	if err != nil {
+		log.Printf("unable to find %v", code)
 		ctx.Response.Header.Set("Content-Type", "application/json")
 		ctx.Response.SetStatusCode(http.StatusNotFound)
 		return
+	} else {
+		log.Printf("redirecting to %v", uri)
 	}
 
 	ctx.Redirect(uri, http.StatusMovedPermanently)

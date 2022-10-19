@@ -18,7 +18,7 @@ spec:
       paths:
       - backend:
           service:
-            name: pocketshorten-service
+            name: pb-service
             port:
               number: 8080
         path: /
