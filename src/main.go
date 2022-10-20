@@ -170,11 +170,9 @@ func main() {
 
 	ds := NewDictstore()
 	for _, element := range dresp2.Items {
+		log.Printf("Storing %v with %v", element.ShortURL, element.LongURL)
 		ds.Store(element.ShortURL, element.LongURL)
 	}
-
-	ds.Store("p1", "https://www.techmeme.com")
-	ds.Store("p2", "https://www.apple.com")
 
 	router := NewHandler("", "", ds)
 
