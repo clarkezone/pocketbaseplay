@@ -93,14 +93,14 @@ buildimage:
 	@echo ${IMG}
 	@echo ${VERSION}
 
-	podman manifest exists localhost/pocketshortenp:latest
-	if [ $$? -eq 0 ]; \
-	    	then \
-		echo "Manifest doesn't exist"; \
-		podman manifest rm localhost/pocketshortenp:latest
-		false; \
-	fi
-	#@echo $?
+	-podman manifest exists localhost/pocketshortenp:latest
+
+ifeq ($$?,0)
+	echo "Manifest exists" \
+	podman manifest rm localhost/pocketshortenp:latest
+else
+	echo "Manifest doesn't exist"
+endif
 	#podman manifest rm localhost/pocketshortenp:latest
 	
 	podman build --arch=amd64 -t ${IMG}:${VERSION}.amd64 -f Dockerfile
