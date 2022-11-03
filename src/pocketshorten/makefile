@@ -87,17 +87,17 @@ lint:
 
 .PHONY: buildimage
 buildimage:
-	$(eval IMG := "pocketshortenp")
+	$(eval IMG := "pocketgeotemp")
 	$(eval VERSION := "latest")
 	
 	@echo ${IMG}
 	@echo ${VERSION}
 
-	-podman manifest exists localhost/pocketshortenp:latest
+	-podman manifest exists localhost/pocketgeotemp:latest
 
 ifeq ($$?,0)
 	echo "Manifest exists" \
-	podman manifest rm localhost/pocketshortenp:latest
+	podman manifest rm localhost/pocketgeotemp:latest
 else
 	echo "Manifest doesn't exist"
 endif
@@ -112,7 +112,7 @@ endif
 
 .PHONY: pushimage
 pushimage:
-	$(eval IMG := "pocketshortenp")
+	$(eval IMG := "pocketgeotemp")
 	$(eval VERSION := "latest")
 	
 	@echo ${IMG}
