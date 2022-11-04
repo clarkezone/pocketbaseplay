@@ -4,6 +4,7 @@ namespace: pocketshortener
 resources:
 - ps-deployment.yaml
 - ps-service.yaml
+- ingress.yaml
   #- cloudflared.yaml
 secretGenerator:
 - name: db-user-pass

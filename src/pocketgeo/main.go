@@ -63,16 +63,15 @@ type GeoStruct struct {
 func NewGeoHandler() *router.Router {
 	router := router.New()
 
-	router.GET("/postgeo", geopost)
+	router.POST("/postgeo", geopost)
 	return router
 }
 
 func geopost(ctx *fasthttp.RequestCtx) {
-
 	dresp := GeoStruct{}
 	err := json.Unmarshal(ctx.PostBody(), &dresp)
 	if err != nil {
-		panic(err)
+		log.Println("unable to unmarshal json %v", err)
 	}
 	log.Println("Got a geocoordinate %v", dresp.Locations[0])
 }
@@ -126,6 +125,8 @@ func main() {
 	err = json.Unmarshal(resp.Body(), &dresp)
 	if err != nil {
 		log.Printf("%v", err)
+	} else {
+		log.Println("Pocketbase Authenticated.  Ready for responses")
 	}
 
 	router := NewGeoHandler()
