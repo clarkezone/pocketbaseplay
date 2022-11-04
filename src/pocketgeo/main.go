@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 
@@ -62,18 +63,25 @@ type GeoStruct struct {
 
 func NewGeoHandler() *router.Router {
 	router := router.New()
-
+	router.GET("/", home)
 	router.POST("/postgeo", geopost)
 	return router
 }
 
+func home(ctx *fasthttp.RequestCtx) {
+	fmt.Fprintf(ctx.Response.BodyWriter(), "Hello!")
+	ctx.Logger().Printf("Default")
+}
+
 func geopost(ctx *fasthttp.RequestCtx) {
+	ctx.Logger().Printf("GeoPost")
 	dresp := GeoStruct{}
 	err := json.Unmarshal(ctx.PostBody(), &dresp)
+
 	if err != nil {
-		log.Println("unable to unmarshal json %v", err)
+		ctx.Logger().Printf("unable to unmarshal json %v", err)
 	}
-	log.Println("Got a geocoordinate %v", dresp.Locations[0])
+	ctx.Logger().Printf("Got a geocoordinate %v", dresp)
 }
 
 func main() {
@@ -129,6 +137,7 @@ func main() {
 		log.Println("Pocketbase Authenticated.  Ready for responses")
 	}
 
+	log.Println("Listening for geoevents")
 	router := NewGeoHandler()
 
 	log.Fatal(fasthttp.ListenAndServe(":8080", router.Handler))
