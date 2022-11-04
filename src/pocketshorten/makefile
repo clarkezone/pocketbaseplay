@@ -85,26 +85,15 @@ lint:
 	go vet $(shell go list ./...)
 	golangci-lint run
 
-.PHONY: manifestexists
-manifestexists:
-	$(eval IMG := "pocketgeotemp")
-	$(eval VERSION := "latest")
-	
-	@echo ${IMG}
-	@echo ${VERSION}
-
-# - means continue on error if command returns 0 it means manifest exists hence delete it
-	-podman manifest exists localhost/pocketgeotemp:latest && podman manifest rm localhost/pocketgeotemp:latest
-
 .PHONY: buildimage
 buildimage:
-	$(eval IMG := "pocketgeotemp")
+	$(eval IMG := "pocketshortenp")
 	$(eval VERSION := "latest")
 	
 	@echo ${IMG}
 	@echo ${VERSION}
 
-	-podman manifest exists localhost/$(IMG):latest && podman manifest rm localhost/pocketgeotemp:latest
+	-podman manifest exists localhost/${IMG}:latest && podman manifest rm localhost/${IMG}:latest
 
 	podman build --arch=amd64 -t ${IMG}:${VERSION}.amd64 -f Dockerfile
 	podman build --arch=arm64 -t ${IMG}:${VERSION}.arm64 -f Dockerfile
@@ -115,7 +104,7 @@ buildimage:
 
 .PHONY: pushimage
 pushimage:
-	$(eval IMG := "pocketgeotemp")
+	$(eval IMG := "pocketshortenp")
 	$(eval VERSION := "latest")
 	
 	@echo ${IMG}
