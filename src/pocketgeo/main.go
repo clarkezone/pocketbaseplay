@@ -81,7 +81,10 @@ func geopost(ctx *fasthttp.RequestCtx) {
 	if err != nil {
 		ctx.Logger().Printf("unable to unmarshal json %v", err)
 	}
-	ctx.Logger().Printf("Got a geocoordinate %v", dresp)
+	ctx.Logger().Printf("Got a geocoordinate %v", dresp.Locations[0].Geometry.Coordinates[0])
+
+	ctx.SuccessString("", "")
+
 }
 
 func main() {
