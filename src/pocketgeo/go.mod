@@ -3,9 +3,11 @@ module test.com/geo
 go 1.19
 
 require (
+	github.com/duke-git/lancet/v2 v2.1.8
 	github.com/fasthttp/router v1.4.12
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/valyala/fasthttp v1.40.0
+	golang.org/x/sync v0.1.0
 )
 
 require (

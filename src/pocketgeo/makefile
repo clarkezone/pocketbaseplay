@@ -129,11 +129,11 @@ precommit:
 
 .PHONY: build
 build:
-	$(BUILDCOMMAND) -o ${BINDIR}/previewd
+	$(BUILDCOMMAND) -o ${BINDIR}/pocketgeo
 
 .PHONY: builddlv
 builddlv:
-	$(BUILDCOMMANDDEBUG) -o ${BINDIR}/previewd
+	$(BUILDCOMMANDDEBUG) -o ${BINDIR}/pocketgeo
 
 .PHONY: release
 build-all: $(PLATFORMS)
