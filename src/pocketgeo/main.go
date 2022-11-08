@@ -8,7 +8,6 @@ import (
 	"os"
 
 	"github.com/fasthttp/router"
-	"github.com/go-resty/resty/v2"
 	"github.com/valyala/fasthttp"
 	"test.com/geo/pkg/pocketbase"
 )
@@ -97,8 +96,6 @@ func main() {
 	user := os.Getenv("POCKET_SHORTEN_USERNAME")
 	pass := os.Getenv("POCKET_SHORTEN_PASSWORD")
 	url := os.Getenv("POCKET_DB_URL")
-
-	client := resty.New()
 
 	log.Printf("Geologger.")
 	if url == "" {
