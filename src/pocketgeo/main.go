@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -41,7 +40,40 @@ type PostGeo struct {
 	Timestamp time.Time `json:"timestamp"`
 }
 
+type Current struct {
+	ID           string    `json:"id"`
+	Lat          float64   `json:"lat"`
+	Lon          float64   `json:"lon"`
+	Timestamp    time.Time `json:"timestamp"`
+	Speed        int       `json:"speed"`
+	BatteryLevel float64   `json:"batterylevel"`
+	Wifi         string    `json:"wifi"`
+	Altitude     int       `json:"altitude"`
+	BatteryState string    `json:"batterystate"`
+}
+
 type GeoStruct struct {
+	Locations []struct {
+		Type     string `json:"type"`
+		Geometry struct {
+			Type        string    `json:"type"`
+			Coordinates []float64 `json:"coordinates"`
+		} `json:"geometry"`
+		Properties struct {
+			Motion             []string  `json:"motion"`
+			Speed              int       `json:"speed"`
+			BatteryLevel       float64   `json:"battery_level"`
+			Altitude           int       `json:"altitude"`
+			BatteryState       string    `json:"battery_state"`
+			HorizontalAccuracy int       `json:"horizontal_accuracy"`
+			VerticalAccuracy   int       `json:"vertical_accuracy"`
+			Timestamp          time.Time `json:"timestamp"`
+			Wifi               string    `json:"wifi"`
+		} `json:"properties"`
+	} `json:"locations"`
+}
+
+type GeoStruct2 struct {
 	Current struct {
 		Type     string `json:"type"`
 		Geometry struct {
@@ -51,7 +83,7 @@ type GeoStruct struct {
 		Properties struct {
 			Motion             []interface{} `json:"motion"`
 			Speed              int           `json:"speed"`
-			BatteryLevel       int           `json:"battery_level"`
+			BatteryLevel       float64       `json:"battery_level"`
 			Wifi               string        `json:"wifi"`
 			VerticalAccuracy   int           `json:"vertical_accuracy"`
 			HorizontalAccuracy int           `json:"horizontal_accuracy"`
@@ -227,10 +259,14 @@ type GeoStruct struct {
 	} `json:"locations"`
 }
 
-func NewGeoHandler() *router.Router {
+type dbLayer struct {
+	db *pocketbase.Client
+}
+
+func NewGeoHandler(layer *dbLayer) *router.Router {
 	router := router.New()
 	router.GET("/", home)
-	router.POST("/postgeo", geopost)
+	router.POST("/postgeo", func(ctx *fasthttp.RequestCtx) { layer.geopost(ctx) })
 	return router
 }
 
@@ -239,28 +275,40 @@ func home(ctx *fasthttp.RequestCtx) {
 	ctx.Logger().Printf("Default")
 }
 
-func geopost(ctx *fasthttp.RequestCtx) {
+func NewDbLayer(url string, un string, pw string) *dbLayer {
+	db := &dbLayer{}
+	db.db = pocketbase.NewClient(url, un, pw)
+	return db
+}
+
+func (d *dbLayer) geopost(ctx *fasthttp.RequestCtx) {
 	ctx.Logger().Printf("GeoPost")
 	body := ctx.PostBody()
 
 	dresp := GeoStruct{}
-	file, err := ioutil.TempFile("/tmp/geopoints", "")
-	if err != nil {
-		ctx.Logger().Printf("Failed to create tempfile")
-	} else {
-		defer file.Close()
-	}
+	// file, err := ioutil.TempFile("/tmp/geopoints", "")
+	// if err != nil {
+	// 	ctx.Logger().Printf("Failed to create tempfile")
+	// } else {
+	// 	defer file.Close()
+	// }
 
-	file.Write(body)
+	// file.Write(body)
 
-	err = json.Unmarshal(body, &dresp)
+	err := json.Unmarshal(body, &dresp)
 
 	if err != nil {
 		ctx.Logger().Printf("unable to unmarshal json %v", err)
 	}
 	ctx.Logger().Printf("Got a geocoordinate %v", dresp.Locations[0].Geometry.Coordinates[0])
 
-	ctx.SuccessString("", "")
+	writeCurrent(body, d.db)
+
+	ctx.SuccessString("text/json",
+		`
+{
+    "result": "ok"
+}`)
 
 }
 
@@ -269,7 +317,9 @@ func main() {
 	pass := os.Getenv("POCKET_SHORTEN_PASSWORD")
 	url := os.Getenv("POCKET_DB_URL")
 
-	log.Printf("Geologger.")
+	db := NewDbLayer(url, user, pass)
+
+	log.Printf("Geologger. Now with logging.")
 	if url == "" {
 		log.Printf("%c", errors.New("Environment variable POCKET_DB_URL not set"))
 	} else {
@@ -288,43 +338,93 @@ func main() {
 		log.Printf("Database pw= %v", pass)
 	}
 
-	testWrite(url, user, pass)
+	//testWrite(db)
 
-	//log.Println("Listening for geoevents")
-	//router := NewGeoHandler()
+	log.Println("Listening for geoevents")
+	router := NewGeoHandler(db)
 
-	//log.Fatal(fasthttp.ListenAndServe("0.0.0.0:8080", router.Handler))
+	log.Fatal(fasthttp.ListenAndServe("0.0.0.0:8080", router.Handler))
 
 	// TODO test locally with CURL
 	// TODO dockerize and deploy to cluster
 	// TODO add cloudflare ingress
 }
 
-func testWrite(url string, user string, pass string) {
+func testWrite(writeclient *dbLayer) {
 	jsonString := getTestString()
+	writeCurrent([]byte(jsonString), writeclient.db)
+}
+
+func writeCurrent(jsonString []byte, writeclient *pocketbase.Client) {
 	dresp := GeoStruct{}
 	err := json.Unmarshal([]byte(jsonString), &dresp)
 	if err != nil {
 		log.Printf("error writing %v", err)
 	}
 
-	pg := PostGeo{}
-	pg.Lat = dresp.Current.Geometry.Coordinates[0]
-	pg.Lon = dresp.Current.Geometry.Coordinates[1]
-	pg.Timestamp = dresp.Current.Properties.Timestamp
+	if len(dresp.Locations) > 0 {
+		for n, i := range dresp.Locations {
 
-	bytes, err := json.Marshal(pg)
-	if err != nil {
-		log.Printf("error writing %v", err)
+			pg := Current{}
+			pg.ID = "m379ubb7b6koomg"
+			pg.Lat = i.Geometry.Coordinates[0]
+			pg.Lon = i.Geometry.Coordinates[1]
+			pg.Timestamp = i.Properties.Timestamp
+			if i.Properties.Speed == -1 {
+				pg.Speed = 0
+			} else {
+				pg.Speed = i.Properties.Speed
+			}
+			pg.BatteryLevel = i.Properties.BatteryLevel
+			pg.Wifi = i.Properties.Wifi
+			pg.Altitude = i.Properties.Altitude
+			pg.BatteryState = i.Properties.BatteryState
+
+			bytes, err := json.Marshal(pg)
+			if err != nil {
+				log.Printf("error writing %v", err)
+			}
+			err = writeclient.Update("currentsitrep", "m379ubb7b6koomg", string(bytes))
+			if err != nil {
+				log.Print("update failed, trying create", err)
+				err = writeclient.Create("currentsitrep", string(bytes))
+				if err != nil {
+					log.Printf("Create failed")
+				}
+			} else {
+				log.Printf("Success: %d", n)
+			}
+		}
 	}
 
-	writeclient := pocketbase.NewClient(url, user, pass)
-	err = writeclient.Create("geolog", string(bytes))
-	if err != nil {
-		log.Printf("error writing %v", err)
-	} else {
-		log.Printf("Success")
-	}
+	// if len(dresp.Current.Geometry.Coordinates) > 0 {
+	// 	pg := Current{}
+	// 	pg.ID = "m379ubb7b6koomg"
+	// 	pg.Lat = dresp.Current.Geometry.Coordinates[0]
+	// 	pg.Lon = dresp.Current.Geometry.Coordinates[1]
+	// 	pg.Timestamp = dresp.Current.Properties.Timestamp
+	// 	pg.Speed = dresp.Current.Properties.Speed
+	// 	pg.BatteryLevel = dresp.Current.Properties.BatteryLevel
+	// 	pg.Wifi = dresp.Current.Properties.Wifi
+	// 	pg.Altitude = dresp.Current.Properties.Altitude
+	// 	pg.BatteryState = dresp.Current.Properties.BatteryState
+
+	// 	bytes, err := json.Marshal(pg)
+	// 	if err != nil {
+	// 		log.Printf("error writing %v", err)
+	// 	}
+
+	// 	err = writeclient.Update("currentsitrep", "m379ubb7b6koomg", string(bytes))
+	// 	if err != nil {
+	// 		log.Print("update failed, trying create", err)
+	// 		err = writeclient.Create("currentsitrep", string(bytes))
+	// 		if err != nil {
+	// 			log.Printf("Create failed")
+	// 		}
+	// 	} else {
+	// 		log.Printf("Success")
+	// 	}
+	// }
 }
 
 func getTestString() string {
