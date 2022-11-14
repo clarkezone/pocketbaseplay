@@ -389,7 +389,7 @@ func writeCurrent(jsonString []byte, writeclient *pocketbase.Client) {
 				log.Print("update failed, trying create", err)
 				err = writeclient.Create("currentsitrep", string(bytes))
 				if err != nil {
-					log.Printf("Create failed")
+					log.Printf("Create failed %v", err.Error())
 				}
 			} else {
 				log.Printf("Success: %d", n)
