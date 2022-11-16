@@ -362,11 +362,12 @@ func writeCurrent(jsonString []byte, writeclient *pocketbase.Client) {
 		log.Printf("error writing %v", err)
 	}
 
+	const recid = "t8ft2af0gqa0kjo" //m379ubb7b6koomg
 	if len(dresp.Locations) > 0 {
 		for n, i := range dresp.Locations {
 
 			pg := Current{}
-			pg.ID = "m379ubb7b6koomg"
+			pg.ID = recid
 			pg.Lat = i.Geometry.Coordinates[0]
 			pg.Lon = i.Geometry.Coordinates[1]
 			pg.Timestamp = i.Properties.Timestamp
